@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TV Corporativa</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #000;
+      overflow: hidden;
+    }
+    video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <video id="player" autoplay muted loop playsinline>
+    <source src="/videos/video_atual.mp4" type="video/mp4">
+  </video>
+  <script>
+    const video = document.getElementById('player');
+
+    // Recarrega o vídeo a cada 5 minutos para pegar atualizações
+    setInterval(() => {
+      const src = '/videos/video_atual.mp4?t=' + Date.now();
+      video.src = src;
+      video.load();
+      video.play().catch(() => {});
+    }, 5 * 60 * 1000);
+
+    video.addEventListener('error', () => {
+      setTimeout(() => {
+        video.load();
+        video.play().catch(() => {});
+      }, 5000);
+    });
+  </script>
+</body>
+</html>

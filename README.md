@@ -1,50 +1,91 @@
-# TV Corporativa - Solução Docker Linux
+# TV Corporativa — Solução Docker Linux
 
-Uma solução leve e eficiente baseada em Docker para a exibição contínua de conteúdos de vídeo em diversas telas de TV Corporativa simultaneamente.
+Uma solução leve e eficiente baseada em Docker para exibição contínua de vídeos em telas de TV corporativa.
 
-## 1. Descrição
-Este projeto foi desenvolvido para simplificar a gestão de sinalização digital (Digital Signage). Ele permite que um único vídeo ou fluxo de mídia seja transmitido de forma sincronizada para múltiplos dispositivos (como Smart TVs, Android Boxes ou Tizen) utilizando a infraestrutura Docker.
+## Como funciona
 
-> Em uso na **suaempresa** — exibição contínua de mídia em telas de TV corporativa.
+```
+┌─────────────┐        ┌────────────────────────────────────┐
+│  Smart TV   │◄──────►│  Nginx (porta 81)                  │
+│  Android    │        │  ├─ /videos/ → serve arquivo direto│
+│  Tizen      │        │  └─ /       → proxy → Node.js      │
+└─────────────┘        └────────────────────────────────────┘
+                                           │
+                                   ┌───────▼────────┐
+                                   │  Node.js :3000 │
+                                   │  Login + Upload│
+                                   └────────────────┘
+```
 
-## 2. Funcionalidades
-* **Deploy Rápido:** Configuração via `docker-compose`.
-* **Baixo Consumo:** Otimizado para rodar em servidores locais ou VPS.
-* **Compatibilidade:** Testado em telas de 55 polegadas e diversos players.
-* **Automação:** Scripts integrados para reinicialização automática e monitoramento.
+- **`/tv`** — página fullscreen para as TVs (loop automático do vídeo)
+- **`/dashboard`** — painel para upload de novo vídeo (requer login)
+- O vídeo enviado substitui o arquivo atual em tempo real
 
-## 3. Pré-requisitos
-Antes de começar, você precisará ter instalado em sua máquina:
-* [Docker](https://www.docker.com/)
-* [Docker Compose](https://docs.docker.com/compose/)
+## Pré-requisitos
 
-## 4. Instalação e Uso
+- [Docker](https://www.docker.com/)
+- [Docker Compose](https://docs.docker.com/compose/)
+
+## Instalação
 
 1. Clone o repositório:
    ```bash
    git clone https://github.com/acorrea1/tv-aviso-empresa.git
+   cd tv-aviso-empresa
    ```
 
-2. Acesse a pasta do projeto:
+2. Configure as credenciais:
    ```bash
-   cd tv-aviso-empresa
+   cp .env.example .env
+   # Edite o .env com seu usuário, senha e segredo de sessão
    ```
 
 3. Suba os containers:
    ```bash
-   docker-compose up -d
+   docker-compose up -d --build
    ```
 
-## 5. Tecnologias Utilizadas
-1. Docker & Docker Compose
-2. Nginx (como servidor web/proxy)
-3. Shell Script para automação de logs
+4. Acesse:
+   - **Painel admin:** `http://seu-servidor:81/login.html`
+   - **TV (exibição):** `http://seu-servidor:81/tv`
 
-## 6. Créditos e Atribuições
-Este projeto foi desenvolvido por Adonias Correa com o apoio colaborativo de ferramentas de Inteligência Artificial para a arquitetura de sistemas, depuração de scripts e otimização de containers:
-1. Google Gemini
-2. ChatGPT (OpenAI)
-3. DeepSeek
+## Estrutura do projeto
 
-## 7. Licença
-Distribuído sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
+```
+tv-aviso-empresa/
+├── docker-compose.yml
+├── nginx.conf
+├── .env.example
+└── app/
+    ├── Dockerfile
+    ├── package.json
+    ├── server.js
+    └── public/
+        ├── login.html   ← login do painel
+        ├── admin.html   ← upload de vídeo
+        └── tv.html      ← exibição nas TVs
+```
+
+## Variáveis de ambiente (`.env`)
+
+| Variável         | Descrição                        | Padrão        |
+|------------------|----------------------------------|---------------|
+| `TV_USER`        | Usuário do painel admin          | `admin`       |
+| `TV_PASS`        | Senha do painel admin            | `admin123`    |
+| `SESSION_SECRET` | Segredo da sessão (troque!)      | *(obrigatório)*|
+
+## Tecnologias
+
+- **Docker & Docker Compose**
+- **Nginx** — entrega de vídeo em alta performance
+- **Node.js + Express** — backend de autenticação e upload
+- **Multer** — gerenciamento de uploads
+
+## Créditos
+
+Desenvolvido por Adonias Correa com apoio de ferramentas de IA:
+Google Gemini, ChatGPT (OpenAI) e DeepSeek.
+
+## Licença
+
+MIT — veja o arquivo `LICENSE`.

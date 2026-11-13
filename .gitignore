@@ -1,0 +1,4 @@
+.env
+app/uploads/
+app/videos/
+node_modules/

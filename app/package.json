@@ -1,0 +1,10 @@
+{
+  "name": "tv-aviso-empresa",
+  "version": "1.0.0",
+  "dependencies": {
+    "express": "latest",
+    "multer": "latest",
+    "express-session": "latest",
+    "dotenv": "latest"
+  }
+}
